@@ -1,14 +1,20 @@
 package com.main;
 
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 
 public class Card {
     public static int PROPERTY_WIDTH=110;
     public static int PROPERTY_HEIGHT=80;
     public static int CHANCE_HEIGHT=75;
 
+    public int group=0;
+
+    private User belongs;
     private int posX;
     private int posY;
     private int width;
@@ -18,10 +24,12 @@ public class Card {
     private int returnPrice;
     private boolean isOccupied;
     public int index;
+    public int rentPrice=0;
+    public Color borderColor=Color.GREENYELLOW;
     public Pane pn;
 
     Card(int posX, int posY, int width, int height, CardTypes type, int price, int returnPrice,
-         boolean isOccupied,int index) {
+         boolean isOccupied,int index, int group,int rentPrice) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -31,19 +39,33 @@ public class Card {
         this.returnPrice = returnPrice;
         this.isOccupied = isOccupied;
         this.index = index;
+        this.group = group;
+        this.rentPrice=rentPrice;
         this.pn = new Pane();
         pn.setTranslateX(posX);
         pn.setTranslateY(posY);
         pn.setPrefSize(width, height);
-
         BorderStroke borderStroke = new BorderStroke(
-                Color.GREENYELLOW, // Border color
-                BorderStrokeStyle.SOLID, // Border style
-                CornerRadii.EMPTY, // Corner radii
-                new BorderWidths(3) // Border widths
+                borderColor,
+                BorderStrokeStyle.SOLID,
+                CornerRadii.EMPTY,
+                new BorderWidths(3)
         );
 
         pn.setBorder(new Border(borderStroke));
+        pn.getChildren().add(new Label(String.valueOf(this.group)));
+    }
+
+    public void buyCard(User user){
+        this.setBelongs(user);
+        BorderStroke borderStroke = new BorderStroke(
+                user.getColor(),
+                BorderStrokeStyle.SOLID,
+                CornerRadii.EMPTY,
+                new BorderWidths(3)
+        );
+        this.pn.setBorder(new Border(borderStroke));
+        this.setOccupied(true);
     }
 
     public CardTypes getType() {
@@ -110,7 +132,11 @@ public class Card {
         this.returnPrice = returnPrice;
     }
 
-//    public int[] getUserPosition(int x, int y){
-//        if()
-//    }
+    public User getBelongs() {
+        return belongs;
+    }
+
+    public void setBelongs(User belongs) {
+        this.belongs = belongs;
+    }
 }

@@ -76,7 +76,7 @@ public class Dice {
     public void throwDice() {
         this.position = generateRandomPosition();
         value = random.nextInt(6) + 1;
-        System.out.println("Кубик показує: " + value);
+//        System.out.println("Кубик показує: " + value);
 
         Timeline rotation = createRotationAnimation();
         Timeline drop = dropAnimation();

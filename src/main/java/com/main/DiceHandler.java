@@ -1,6 +1,7 @@
 package com.main;
 
 import com.main.interfaces.DiceRolledListener;
+import com.main.interfaces.GameListener;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,9 +13,9 @@ public class DiceHandler {
     public final Dice dice1;
     public final Dice dice2;
     public final Button throwButton;
-    private DiceRolledListener listener;
+    private GameListener listener;
 
-    public DiceHandler(DiceRolledListener listener){
+    public DiceHandler(GameListener listener){
         this.dice1 = new Dice(50, 250, 50, 350);
         this.dice2 = new Dice(300, 501, 50, 350);
 

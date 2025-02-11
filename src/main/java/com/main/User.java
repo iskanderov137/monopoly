@@ -3,22 +3,18 @@ package com.main;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.util.ArrayList;
+
 public class User {
     private int pos = 0;
-    private int posX;
-    private int posY;
     private int cycle = 0;
+    private float balance = 2000;
     private Color color;
-    public Circle circle;
+    private boolean isEliminated = false;
+    public ArrayList<Card> boughtCards = new ArrayList<>();
 
-    User(Color color, int posX, int posY) {
-        this.circle = new Circle();
-        circle.setCenterX(posX);
-        circle.setCenterY(posY);
-        circle.setRadius(20);
-        circle.setFill(color);
-        circle.setStroke(color);
-        circle.setStrokeWidth(1);
+    User(Color color) {
+        this.color=color;
     }
 
     public Color getColor() {
@@ -29,31 +25,12 @@ public class User {
         this.color = color;
     }
 
-    public int getPosX() {
-        return posX;
-    }
-
-    public int getPosY() {
-        return posY;
-    }
-
-    public void setPosX(int newPosX) {
-        this.posX = newPosX;
-        circle.setCenterX(this.posX);
-    }
-
-    public void setPosY(int newPosY) {
-        this.posY = newPosY;
-        circle.setCenterY(this.posY);
-    }
-
     public void setPosition(int pos) {
-        if (pos > 39) {
+        this.pos += pos;
+        if (this.pos > 39) {
             this.cycle++;
-            pos %= 40;
+            this.pos %= 40;
         }
-        System.out.println("Cycle: " + this.cycle);
-        this.pos = pos;
     }
 
     public int getPosition() {
@@ -66,5 +43,30 @@ public class User {
 
     public void setCycle(int cycle) {
         this.cycle = cycle;
+    }
+
+    public void buyCard(Card card) {
+        if (this.balance > card.getPrice()) {
+            this.boughtCards.add(card);
+            this.balance -= card.getPrice();
+            card.setBelongs(this);
+            card.setOccupied(true);
+        }
+    }
+
+    public float getBalance() {
+        return balance;
+    }
+
+    public void setBalance(float balance) {
+        this.balance=balance;
+    }
+
+    public void eliminate() {
+        this.isEliminated = true;
+    }
+
+    public boolean isEliminated() {
+        return this.isEliminated;
     }
 }

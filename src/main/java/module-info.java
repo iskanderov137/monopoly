@@ -10,6 +10,7 @@ module com.example.demo {
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
     requires jdk.httpserver;
+    requires jdk.jfr;
 
     opens com.main to javafx.fxml;
     exports com.main;
