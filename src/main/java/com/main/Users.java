@@ -5,15 +5,13 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.main.Card.PROPERTY_HEIGHT;
-
 public class Users {
     public List<User> users;
-    public static int numberOfUsers=3;
+    public static int numberOfUsers = 3;
     private int curUser = 0;
 
-    public Users(){
-        this.users=new ArrayList<>(numberOfUsers);
+    public Users() {
+        this.users = new ArrayList<>(numberOfUsers);
         this.users.add(new User(Color.RED));
         this.users.add(new User(Color.YELLOW));
         this.users.add(new User(Color.BLUE));
@@ -31,21 +29,41 @@ public class Users {
         return users.get(index);
     }
 
-    public void changeUserPosition(int total){
-        User user=this.getCurUser();
+    public void changeUserPosition(int total) {
+        User user = this.getCurUser();
         user.setPosition(total);
     }
 
-    public void changeTurn() {
+    public int changeTurn() {
         int index = curUser;
-        int nextIndex;
-        do {
-            nextIndex = (index + 1) % users.size();
+        int aliveCount = 0;
+
+        for (int i = 0; i < users.size(); i++) {
+            if (!this.getUserByIndex(i).isEliminated()) {
+                aliveCount++;
+            }
+        }
+
+        if (aliveCount == 1) {
+            return -1;
+        }
+        for (int i = 1; i < users.size(); i++) {
+            int nextIndex = (index + i) % users.size();
             if (!this.getUserByIndex(nextIndex).isEliminated()) {
                 curUser = nextIndex;
-                break;
+                return nextIndex;
             }
-        } while (index != nextIndex);
+        }
+        return index;
+    }
 
+    public int amountOfActivePlayers(){
+        int count=0;
+        for (int i = 0; i < users.size(); i++) {
+            if (!this.getUserByIndex(i).isEliminated()) {
+                count++;
+            }
+        }
+        return count;
     }
 }

@@ -1,18 +1,23 @@
 package com.main;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-
-import java.util.ArrayList;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
 
 public class Card {
-    public static int PROPERTY_WIDTH=110;
-    public static int PROPERTY_HEIGHT=80;
-    public static int CHANCE_HEIGHT=75;
+    public static int PROPERTY_WIDTH = 110;
+    public static int PROPERTY_HEIGHT = 80;
+    public static int CHANCE_HEIGHT = 75;
 
-    public int group=0;
+    public int group;
 
     private User belongs;
     private int posX;
@@ -24,12 +29,14 @@ public class Card {
     private int returnPrice;
     private boolean isOccupied;
     public int index;
-    public int rentPrice=0;
-    public Color borderColor=Color.GREENYELLOW;
-    public Pane pn;
+    public int rentPrice;
+    public int rentPriceWithHouses;
+    public int upgradePrice;
+    public int level = 0;
+    public Color borderColor = Color.TRANSPARENT;
 
     Card(int posX, int posY, int width, int height, CardTypes type, int price, int returnPrice,
-         boolean isOccupied,int index, int group,int rentPrice) {
+         boolean isOccupied, int index, int group, int rentPrice, int upgradePrice) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -40,32 +47,10 @@ public class Card {
         this.isOccupied = isOccupied;
         this.index = index;
         this.group = group;
-        this.rentPrice=rentPrice;
-        this.pn = new Pane();
-        pn.setTranslateX(posX);
-        pn.setTranslateY(posY);
-        pn.setPrefSize(width, height);
-        BorderStroke borderStroke = new BorderStroke(
-                borderColor,
-                BorderStrokeStyle.SOLID,
-                CornerRadii.EMPTY,
-                new BorderWidths(3)
-        );
+        this.rentPrice = rentPrice;
+        this.upgradePrice = upgradePrice;
+        this.rentPriceWithHouses = rentPrice;
 
-        pn.setBorder(new Border(borderStroke));
-        pn.getChildren().add(new Label(String.valueOf(this.group)));
-    }
-
-    public void buyCard(User user){
-        this.setBelongs(user);
-        BorderStroke borderStroke = new BorderStroke(
-                user.getColor(),
-                BorderStrokeStyle.SOLID,
-                CornerRadii.EMPTY,
-                new BorderWidths(3)
-        );
-        this.pn.setBorder(new Border(borderStroke));
-        this.setOccupied(true);
     }
 
     public CardTypes getType() {
@@ -110,6 +95,56 @@ public class Card {
 
     public int getPrice() {
         return price;
+    }
+
+    public int getRentPrice() {
+        if (this.level == 0 || type == CardTypes.CARD_TYPE_SPECIAL_PROPERTY) {
+            return rentPrice;
+        } else {
+            return rentPriceWithHouses;
+        }
+    }
+
+    public void setRentPrice(int rentPrice) {
+        this.rentPrice = rentPrice;
+    }
+
+    public void upgradeSpecialCardRentPrice() {
+        if (group == 9) {
+            if (level == 0) {
+                if (this.rentPrice == 280) {
+                    this.rentPrice = 620;
+                }
+                if (this.rentPrice == 220) {
+                    this.rentPrice = 450;
+                }
+                this.level++;
+            } else {
+                if (this.rentPrice == 620) {
+                    this.rentPrice = 920;
+                }
+                if (this.rentPrice == 450) {
+                    this.rentPrice = 760;
+                }
+            }
+        }
+    }
+
+    public void upgradeCardRentPrice() {
+        if (level == 0) {
+            level = 5;
+        }
+        if (level == 5) {
+            level = 15;
+        } else if (level == 15) {
+            level = 30;
+        } else if (level == 30) {
+            level = 45;
+            this.upgradePrice += 10;
+        } else if (level == 45) {
+            level = 50;
+        }
+        this.rentPriceWithHouses = level * rentPrice;
     }
 
     public int getReturnPrice() {
