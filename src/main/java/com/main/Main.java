@@ -12,21 +12,24 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.*;
-
+//Головний движок гри
 public class Main extends Application {
+    //Кадр останнього оновлення екрана
     private long lastUpdate = 0;
+    //Поточний час (Для таймера)
     public long curTime = 0;
-
+    //Створення двох кубиків
     public Dice dice1;
     public Dice dice2;
-
+    //Сповіщення про виграш
     private final Alert winAlert = new Alert(Alert.AlertType.CONFIRMATION);
+    //Список усіх гравців
     public Users users;
-
+    //Список усіх випадкових карточок
     public HashMap<Integer, String> chances = new HashMap<>();
-
+    //Ігрове поле
     private GameField gameField;
-
+    //Метод що розпочинає гру
     @Override
     public void start(Stage primaryStage) {
         loadChances();
@@ -48,7 +51,6 @@ public class Main extends Application {
             @Override
             public void handle(long now) {
                 if (lastUpdate > 0) {
-//                    double deltaTime = (now - lastUpdate) / 1e9;
                     long timeLeft = gameField.maxTimePerTurn - Calendar.getInstance().getTime().getTime() + curTime;
                     gameField.drawTimerLeft(timeLeft);
                     try {
@@ -77,11 +79,11 @@ public class Main extends Application {
         };
         gameLoop.start();
     }
-
+    //Головний метод для запуску програми
     public static void main(String[] args) {
         launch();
     }
-
+    //Метод для обробки кидання кубиків+ логіка з покупками
     @FXML
     public void handleThrowButton(ActionEvent actionEvent) {
         //Вивести кубики
@@ -168,8 +170,6 @@ public class Main extends Application {
                         this.users.getCurUser().setBalance(users.getCurUser().getBalance() - card.getPrice());
                         gameField.buyCard(this.users.getCurUser(), card);
                         this.users.getCurUser().boughtCards.add(card);
-                        //Додати у стек подій покупку
-                        // Додати слухача події для відʼємного балансу
                     }
                 }
             }
@@ -306,7 +306,7 @@ public class Main extends Application {
         curTime = Calendar.getInstance().getTime().getTime();
         this.gameField.drawCurPlayerLabelCircle(this.users.getCurUser().getColor());
     }
-
+    //Створення випадкових карточок для поля Chance
     public void loadChances() {
         chances.put(1, "Day of independence, get 10$ for every card you have.");
         chances.put(2, "Bank has made a mistake in your favor. Get 150$.");
@@ -324,7 +324,7 @@ public class Main extends Application {
         chances.put(14, "Sell of shares. You get 100$.");
         chances.put(15, "Fine for speeding. Pay 20$.");
     }
-
+    //Генерація випадкової події Chance
     public void generateChanceCard() {
         Random random = new Random();
         int chance = random.nextInt(1, 16);

@@ -18,8 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-
+//Репрезентація кубика
 public class Dice {
+    //Позицію на екрані
     private static class DicePosition {
         int x, y;
 
@@ -28,32 +29,38 @@ public class Dice {
             this.y = y;
         }
     }
-
+    //Початкова позиція на екрані по Х
     private final double startX = 300;
+    //Початкова позиція на екрані по У
     private final double startY = -200;
+    //Початковий оборот кубика по Х
     private final double startRotateX = 0;
+    //Початковий оборот кубика по У
     private final double startRotateY = 0;
+    //Клас для рандомних чисел
     private final Random random;
+    //Масив що визначає чи доступна позиція для кубика
     private static List<DicePosition> occupiedPositions = new ArrayList<>();
+    //Позиція по Х,У
     private DicePosition position;
-
+    //Контейнер для JavaFX
     public Group group;
-
+    //Координати на яких кубик може падати
     private final int minW;
     private final int minH;
     private final int maxW;
     private final int maxH;
-
+    //Зображення 6 сторін
     private static final String img1 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice1.png")).toString();
     private static final String img2 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice2.png")).toString();
     private static final String img3 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice3.png")).toString();
     private static final String img4 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice4.png")).toString();
     private static final String img5 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice5.png")).toString();
     private static final String img6 = Objects.requireNonNull(Dice.class.getResource("/imgs/dice6.png")).toString();
-
+    //Значення що випало
     public int value = 0;
 
-
+    //Встановлення зображень і початкових значень
     Dice(int minW, int maxW, int minH, int maxH) {
         this.minH = minH;
         this.minW = minW;
@@ -72,11 +79,10 @@ public class Dice {
         group.setTranslateX(startX);
         group.setTranslateY(startY);
     }
-
+    //Метод що кидає кубик, (Генерування числа + анімація падіння)
     public void throwDice() {
         this.position = generateRandomPosition();
         value = random.nextInt(6) + 1;
-//        System.out.println("Кубик показує: " + value);
 
         Timeline rotation = createRotationAnimation();
         Timeline drop = dropAnimation();
@@ -89,7 +95,7 @@ public class Dice {
         rotation.play();
     }
 
-
+    //Перевірка чи випадкова позиція не є зайнятою
     private boolean isPositionOccupied(DicePosition position) {
         for (DicePosition p : occupiedPositions) {
             if (Math.abs(p.x - position.x) < 100 && Math.abs(p.y - position.y) < 100) {
@@ -98,7 +104,7 @@ public class Dice {
         }
         return false;
     }
-
+    //Генерування випадкової позиції
     private DicePosition generateRandomPosition() {
         int x = random.ints(minW, maxW).findFirst().getAsInt();
         int y = random.ints(minH, maxH).findFirst().getAsInt();
@@ -115,7 +121,7 @@ public class Dice {
         occupiedPositions.add(pos);
         return pos;
     }
-
+    //Створення анімації обертання
     private Timeline createRotationAnimation() {
         Rotate rotateX = new Rotate(0, new Point3D(1, 0, 0));
         Rotate rotateY = new Rotate(0, new Point3D(0, 1, 0));
@@ -154,14 +160,14 @@ public class Dice {
         rotationAnimation.setCycleCount(1);
         return rotationAnimation;
     }
-
+    //Повернення до початковї позиції
     private void resetToStartPosition() {
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(event -> {
             Rotate rotateX = new Rotate(startRotateX, new Point3D(1, 0, 0));
             Rotate rotateY = new Rotate(startRotateY, new Point3D(0, 1, 0));
 
-            group.getTransforms().clear(); // Очищення попередніх трансформацій
+            group.getTransforms().clear();
             group.getTransforms().addAll(rotateX, rotateY);
 
             Timeline resetAnimation = new Timeline(
@@ -180,7 +186,7 @@ public class Dice {
         });
         pause.play();
     }
-
+    //Анімація кидання
     private Timeline dropAnimation() {
         Timeline fallAnimation = new Timeline(
                 new KeyFrame(Duration.ZERO,
@@ -200,7 +206,7 @@ public class Dice {
         fallAnimation.setCycleCount(1);
         return fallAnimation;
     }
-
+    //Створення кубика
     private Box createDice() {
         Box dice = new Box(50, 50, 50);
         PhongMaterial material = new PhongMaterial();
@@ -208,7 +214,7 @@ public class Dice {
         dice.setMaterial(material);
         return dice;
     }
-
+    //Встановлення текстури на правильні координати
     private void placeTextureOnFace(Group parent, String path, double x, double y, double z, double rx, double ry) {
         Image textureImage = new Image(path);
         PhongMaterial material = new PhongMaterial();

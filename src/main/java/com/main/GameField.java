@@ -24,35 +24,38 @@ import java.util.Objects;
 public class GameField {
     public Pane pn;
 
-    public ArrayList<Circle> userCircles = new ArrayList<>();
-    public ArrayList<Label> userBalancesLabels = new ArrayList<>();
-    public ArrayList<Card> cards = new ArrayList<>();
-    public ArrayList<Label> cardsLabels = new ArrayList<>();
-    public ArrayList<Pane> cardsPanes = new ArrayList<>();
+    public ArrayList<Circle> userCircles = new ArrayList<>(); // Фішки гравців(Червоний, Синій, Жовтий)
+    public ArrayList<Label> userBalancesLabels = new ArrayList<>();//Надписи для балансу користувачів
+    public ArrayList<Card> cards = new ArrayList<>();//Масив  карточки
+    public ArrayList<Label> cardsLabels = new ArrayList<>();//Масив надписів цін для карточок
+    public ArrayList<Pane> cardsPanes = new ArrayList<>();// Контейнер для ціни карточки й самого обʼєкта карточки
 
-    private final Label timeLeftLabel = new Label();
-    private final Label curPlayerLabel = new Label();
-    private final Circle curUserCircle = new Circle();
-    private final Image bgImage = new Image(String.valueOf(Main.class.getResource("/imgs/bg.jpg")));
+    private final Label timeLeftLabel = new Label();//Об'єкт для відображення таймера
+    private final Label curPlayerLabel = new Label();//Надпис якого гравця зараз хід
+    private final Circle curUserCircle = new Circle();//Відображення поточного гравця у формі круга (Колір)
+    private final Image bgImage = new Image(String.valueOf(Main.class.getResource("/imgs/bg.jpg")));//Загрузка головного фону
     public Button throwButton;
 
-    public static int screenSizeX = 1400;
-    public static int screenSizeY = 1000;
-    public int maxTimePerTurn = 30000;
+    public static int screenSizeX = 1400;//Розмір екрана по осі X
+    public static int screenSizeY = 1000;//Розмір екрана по осі Y
+    public int maxTimePerTurn = 30000;//Час на один хід
 
     public GameField() {
+        // Створення головного контейнера
         this.pn = new Pane();
+        //Додавання фішок для гравців
         for (int i = 0; i < 3; i++) {
             Circle circle = new Circle();
             circle.setRadius(20);
             userCircles.add(circle);
             pn.getChildren().add(circle);
         }
-
+        //Створення решти сцени
         this.createScene();
     }
-
+    //Створення сцени
     private void createScene() {
+        //Додавання фонового зображення
         BackgroundImage backgroundImage = new BackgroundImage(
                 bgImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
                 new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
@@ -60,17 +63,19 @@ public class GameField {
         );
         pn.setBackground(new Background(backgroundImage));
         pn.setPickOnBounds(false);
-
+        //Створення таймера
         createTimerLabel();
-
+        //Загрузка карточок
         this.loadCards();
         for (Card card : cards) {
             createCardPane(card);
         }
+        //Малювання кнопки для кидання кубиків
         drawThrowButton();
-
+        //Додавання чорного екрану по боках
         Rectangle blackBackground = new Rectangle(screenSizeX, screenSizeY, Color.BLACK);
 
+        //Додавання всього контейнеру у контейнер JavaFX
         StackPane root = new StackPane();
         root.setPickOnBounds(false);
         root.getChildren().addAll(blackBackground, pn);
@@ -84,6 +89,7 @@ public class GameField {
         primaryStage.show();
     }
 
+    //Малювання кнопки кидання кубиків
     public void drawThrowButton() {
         this.throwButton = new Button("Throw Dice");
         throwButton.setMinWidth(200);
@@ -95,6 +101,7 @@ public class GameField {
         this.pn.getChildren().add(throwButton);
     }
 
+    //Створення поодинокої карточки (Координати, кому належить, ціна і тд)
     public void createCardPane(Card card) {
         Pane cardPane = new Pane();
         cardPane.setTranslateX(card.getPosX());
@@ -102,7 +109,7 @@ public class GameField {
         cardPane.setPrefSize(card.getWidth(), card.getHeight());
         cardsPanes.add(cardPane);
 
-        BackgroundFill bgFill = new BackgroundFill(getGradient(card.borderColor,card), CornerRadii.EMPTY, null);
+        BackgroundFill bgFill = new BackgroundFill(getGradient(card.borderColor, card), CornerRadii.EMPTY, null);
         cardPane.setBackground(new Background(bgFill));
         Label priceLabel = new Label("");
         cardsLabels.add(priceLabel);
@@ -125,27 +132,28 @@ public class GameField {
         cardPane.getChildren().add(priceLabel);
     }
 
-    public void buyCard(User user,Card card) {
+    //Метод який обробляє покупку карточки
+    public void buyCard(User user, Card card) {
         card.setBelongs(user);
         card.borderColor = user.getColor();
-        BackgroundFill bgFill = new BackgroundFill(getGradient(card.borderColor,card), CornerRadii.EMPTY, null);
+        BackgroundFill bgFill = new BackgroundFill(getGradient(card.borderColor, card), CornerRadii.EMPTY, null);
         cardsPanes.get(card.index).setBackground(new Background(bgFill));
         card.setOccupied(true);
         drawPriceLabelText(card);
     }
-
-    public void drawPriceLabelText(Card card){
+    //Малює ціни для переданої карточки
+    public void drawPriceLabelText(Card card) {
         if (card.getType() == CardTypes.CARD_TYPE_PROPERTY || card.getType() == CardTypes.CARD_TYPE_SPECIAL_PROPERTY) {
             if (card.isOccupied()) {
-                cardsLabels.get(card.index).setText(card.getRentPrice()+"$");
+                cardsLabels.get(card.index).setText(card.getRentPrice() + "$");
             } else {
-                cardsLabels.get(card.index).setText(card.getPrice() +"$");
+                cardsLabels.get(card.index).setText(card.getPrice() + "$");
             }
             cardsLabels.get(card.index).setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, null)));
             cardsLabels.get(card.index).setPadding(new Insets(8));
         }
     }
-
+    //Допоміжний метод, малює градієнт для карточок
     private LinearGradient getGradient(Color color, Card card) {
         Stop[] stops = new Stop[]{
                 new Stop(0.0, Color.TRANSPARENT),
@@ -172,7 +180,7 @@ public class GameField {
         }
         return gradient;
     }
-
+    //Створює тексти для балансів гравців
     public void createUsersBalancesLabel(Users users) {
         for (int i = 0; i < users.users.size(); i++) {
             Label lb = new Label();
@@ -196,6 +204,7 @@ public class GameField {
         }
     }
 
+    //Перемальовує тексти для балансів гравців
     public void drawUsersBalances(Users users) {
         for (int i = 0; i < users.users.size(); i++) {
             String text = "";
@@ -209,11 +218,12 @@ public class GameField {
             userBalancesLabels.get(i).setText(text + users.users.get(i).getBalance());
         }
     }
-
+    //Малює кубик
     public void drawDice(Dice dice) {
         this.pn.getChildren().add(dice.group);
     }
 
+    //Створює надписи для тексту для поточного користувача
     public void createCurPlayerLabel(Color color) {
         curPlayerLabel.setTranslateX(350);
         curPlayerLabel.setTranslateY(130);
@@ -230,10 +240,11 @@ public class GameField {
         this.pn.getChildren().add(curUserCircle);
     }
 
+    //Оновлює поточного користувача
     public void drawCurPlayerLabelCircle(Color color) {
         curUserCircle.setFill(color);
     }
-
+    //Створює таймер
     public void createTimerLabel() {
         timeLeftLabel.setTranslateX(600);
         timeLeftLabel.setTranslateY(130);
@@ -242,11 +253,11 @@ public class GameField {
         this.pn.getChildren().add(timeLeftLabel);
         this.drawTimerLeft(maxTimePerTurn);
     }
-
+    //Оновлює таймер
     public void drawTimerLeft(long time) {
         timeLeftLabel.setText("Time left: " + time / 1000);
     }
-
+    //Малює фішку гравця, добавляє анімацію
     public void drawUser(User user, int indexUser) {
         int index = user.getPosition();
         Card card = this.cards.get(index);
@@ -271,13 +282,13 @@ public class GameField {
 
         transition.play();
     }
-
+    //Малює усіх користувачів
     public void drawUsers(Users users) {
         for (int i = 0; i < users.users.size(); i++) {
             this.drawUser(users.users.get(i), i);
         }
     }
-
+    //Завантажує зображення карточок
     private void loadCards() {
         this.cards.add(new Card(225, screenSizeY - 135, Card.PROPERTY_WIDTH, 115,
                 CardTypes.CARD_TYPE_START, 0, 0, false, 0, 0, 0, 0));

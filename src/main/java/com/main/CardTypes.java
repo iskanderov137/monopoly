@@ -1,5 +1,5 @@
 package com.main;
-
+//Типи карточок
 public enum CardTypes {
     CARD_TYPE_PROPERTY,
     CARD_TYPE_JAIL,
